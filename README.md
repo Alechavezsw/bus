@@ -50,12 +50,38 @@ Formato de cada línea en `lines.json`:
 
 Las paradas se listan en orden (`order`). Los horarios son arrays de strings en formato `"HH:MM"`.
 
-## Fuentes de datos
+## Dónde están los horarios reales
+
+Red Tulum **no publica GTFS ni API pública** con horarios. Los horarios reales se consultan en:
+
+1. **App oficial Red Tulum** – [redtulum.gob.ar/app](https://www.redtulum.gob.ar/app) y app móvil (iOS/Android): planificador, horarios y tiempo real.
+2. **Moovit** – [moovitapp.com (San Juan)](https://moovitapp.com/san_juan-6137): por cada línea hay “Ver recorrido” con mapa y horarios. En esta app, al abrir una línea aparece el botón «Ver recorrido en Moovit» que lleva ahí.
+3. **Google Maps** – Buscando la línea o parada suele mostrar horarios si están cargados.
+
+Para **pedir datos abiertos** (GTFS) al gobierno de San Juan: proyectostic@sanjuan.gob.ar (Área TIC, Red Tulum).
+
+## Cómo cargar horarios reales en esta app
+
+Cuando tengas los horarios (por ejemplo copiando desde Moovit o la app Red Tulum), editá `data/lines.json`. En cada línea hay un objeto `"schedules"`. Completalo así:
+
+```json
+"schedules": {
+  "weekday": ["06:00", "06:30", "07:00", "07:30", "12:00", "18:00"],
+  "saturday": ["07:00", "12:00", "18:00"],
+  "sunday": ["08:00", "12:00", "18:00"]
+}
+```
+
+- **weekday**: Lunes a viernes.  
+- **saturday**: Sábados.  
+- **sunday**: Domingos y feriados.  
+
+Las horas van en formato `"HH:MM"`. Si una línea no tiene servicio un día, podés usar `[]` o omitir esa clave. Después de guardar, volvé a hacer `npm run build` y recargá la app (o subí de nuevo a Vercel).
+
+## Otras fuentes
 
 - **Google Maps**: buscar la línea o parada y revisar la sección de horarios.
-- **OpenStreetMap**: en [overpass-turbo.eu](https://overpass-turbo.eu) se pueden consultar rutas y paradas de transporte público si están mapeadas.
-
-Cuando tengas los horarios reales, actualizá `data/lines.json` y recargá la app.
+- **OpenStreetMap**: en [overpass-turbo.eu](https://overpass-turbo.eu) se pueden consultar rutas y paradas si están mapeadas.
 
 ## Cómo subir la app (deploy)
 

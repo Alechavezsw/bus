@@ -133,6 +133,81 @@ body {
   background: var(--accent-hover);
 }
 
+.drawer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.drawer-moovit--gmaps {
+  background: #1a73e8;
+}
+
+.drawer-moovit--gmaps:hover {
+  background: #1557b0;
+}
+
+.drawer-add-schedule {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.drawer-add-schedule h3 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+}
+
+.drawer-add-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.drawer-add-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.drawer-add-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font);
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+}
+
+.drawer-add-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.drawer-add-btn {
+  margin-top: 1rem;
+  padding: 0.6rem 1.25rem;
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.drawer-add-btn:hover {
+  background: var(--accent-hover);
+}
+
 /* Tabs */
 .tabs {
   display: flex;
@@ -412,6 +487,58 @@ body {
 .footer p {
   max-width: 640px;
   margin: 0 auto;
+}
+
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.footer-help {
+  display: block;
+  margin: 0.75rem auto 0;
+  padding: 0.4rem 0;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.footer-help:hover {
+  color: var(--accent);
+}
+
+.help-horarios {
+  max-width: 640px;
+  margin: 0.75rem auto 0;
+  padding: 1rem;
+  font-size: 0.85rem;
+  text-align: left;
+  background: var(--bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.help-horarios p {
+  margin: 0 0 0.75rem;
+}
+
+.help-horarios p:last-child {
+  margin-bottom: 0;
+}
+
+.help-horarios code {
+  font-size: 0.8em;
+  padding: 0.1rem 0.35rem;
+  background: var(--bg-card);
+  border-radius: 4px;
 }
 
 @media (min-width: 480px) {

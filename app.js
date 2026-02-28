@@ -6,6 +6,7 @@
     saturday: 'Sábados',
     sunday: 'Domingos y feriados'
   };
+  const STORAGE_KEY = 'horarios_bus_schedules';
 
   let data = { lines: [], network: '', city: '' };
 
@@ -35,17 +36,50 @@
         lines: allLines.map(l => ({
           ...l,
           stops: l.stops || [],
-          schedules: l.schedules || {},
+          schedules: { ...(l.schedules || {}) },
           description: l.description || (l.departments && l.departments.length ? l.departments.join(', ') : ''),
           moovitUrl: l.moovitUrl || (l.shortName ? 'https://moovitapp.com/san_juan-6137/lines/' + encodeURIComponent(l.shortName) : null)
         }))
       };
+      mergeStoredSchedules();
       return data;
     } catch (e) {
       console.error(e);
       data = { lines: [], departments: [], network: 'Red Tulum', city: 'San Juan' };
       return data;
     }
+  }
+
+  function getStoredSchedules() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function setStoredSchedules(obj) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+    } catch (_) {}
+  }
+
+  function mergeStoredSchedules() {
+    const stored = getStoredSchedules();
+    data.lines.forEach(line => {
+      if (stored[line.id] && typeof stored[line.id] === 'object') {
+        line.schedules = { ...line.schedules, ...stored[line.id] };
+      }
+    });
+  }
+
+  function parseTimeInput(str) {
+    if (!str || typeof str !== 'string') return [];
+    return str
+      .split(/[\s,;]+/)
+      .map(s => s.trim())
+      .filter(s => /^\d{1,2}:\d{2}$/.test(s))
+      .sort();
   }
 
   function buildStopsIndex() {
@@ -186,6 +220,17 @@
     return html || '<p class="empty-state">Sin horarios cargados.</p>';
   }
 
+  function saveLineSchedules(lineId, schedules) {
+    const stored = getStoredSchedules();
+    stored[lineId] = schedules;
+    setStoredSchedules(stored);
+    const line = data.lines.find(l => l.id === lineId);
+    if (line) {
+      line.schedules = { ...line.schedules, ...schedules };
+      showLineDetail(line);
+    }
+  }
+
   function showLineDetail(line) {
     const hasStops = (line.stops || []).length > 0;
     const hasSchedules = line.schedules && Object.keys(line.schedules).length > 0;
@@ -204,11 +249,28 @@
       stopsHtml += `<h3>Horarios</h3>${renderSchedule(line.schedules)}`;
     }
     if (!hasStops && !hasSchedules) {
-      stopsHtml += '<p class="empty-state">Consultar horarios y paradas en la app oficial o en Moovit.</p>';
+      stopsHtml += '<p class="empty-state">Consultar horarios y paradas en Google Maps, la app Red Tulum o Moovit.</p>';
     }
+    const gmapsQuery = 'colectivo ' + (line.shortName || line.id) + ' Red Tulum San Juan Argentina';
+    const gmapsUrl = 'https://www.google.com/maps/search/' + encodeURIComponent(gmapsQuery);
+    stopsHtml += '<div class="drawer-links">';
+    stopsHtml += `<a href="${escapeHtml(gmapsUrl)}" target="_blank" rel="noopener noreferrer" class="drawer-moovit drawer-moovit--gmaps">Ver en Google Maps</a>`;
     if (line.moovitUrl) {
-      stopsHtml += `<a href="${escapeHtml(line.moovitUrl)}" target="_blank" rel="noopener noreferrer" class="drawer-moovit">Ver recorrido en Moovit</a>`;
+      stopsHtml += ` <a href="${escapeHtml(line.moovitUrl)}" target="_blank" rel="noopener noreferrer" class="drawer-moovit">Ver en Moovit</a>`;
     }
+    stopsHtml += '</div>';
+    stopsHtml += `
+    <div class="drawer-add-schedule" data-line-id="${escapeHtml(line.id)}">
+      <h3>Agregar horarios en esta app</h3>
+      <p class="drawer-add-hint">Copiá los horarios de Google Maps o Moovit y pegálos acá (ej. 06:00 06:30 07:00 o 06:00, 06:30). Se guardan en tu navegador y se ven acá mismo.</p>
+      <label class="drawer-add-label">Lunes a viernes</label>
+      <input type="text" class="drawer-add-input" data-day="weekday" placeholder="06:00 06:30 07:00 12:00 18:00" value="${escapeHtml((line.schedules && line.schedules.weekday) ? line.schedules.weekday.join(' ') : '')}">
+      <label class="drawer-add-label">Sábados</label>
+      <input type="text" class="drawer-add-input" data-day="saturday" placeholder="07:00 12:00 18:00" value="${escapeHtml((line.schedules && line.schedules.saturday) ? line.schedules.saturday.join(' ') : '')}">
+      <label class="drawer-add-label">Domingos y feriados</label>
+      <input type="text" class="drawer-add-input" data-day="sunday" placeholder="08:00 12:00 18:00" value="${escapeHtml((line.schedules && line.schedules.sunday) ? line.schedules.sunday.join(' ') : '')}">
+      <button type="button" class="drawer-add-btn" data-action="save-schedule">Guardar horarios</button>
+    </div>`;
     openDrawer(`${line.name}${line.description ? ' – ' + line.description : ''}`, stopsHtml);
   }
 
@@ -275,14 +337,32 @@
   function initClicks() {
     document.addEventListener('click', e => {
       const a = e.target.closest('a[data-action]');
-      if (!a) return;
-      e.preventDefault();
-      const action = a.dataset.action;
-      if (action === 'line') {
-        const line = data.lines.find(l => l.id === a.dataset.lineId);
-        if (line) showLineDetail(line);
-      } else if (action === 'stop') {
-        showStopDetail(a.dataset.stopId, a.dataset.lineIds);
+      if (a) {
+        e.preventDefault();
+        const action = a.dataset.action;
+        if (action === 'line') {
+          const line = data.lines.find(l => l.id === a.dataset.lineId);
+          if (line) showLineDetail(line);
+        } else if (action === 'stop') {
+          showStopDetail(a.dataset.stopId, a.dataset.lineIds);
+        }
+        return;
+      }
+      const saveBtn = e.target.closest('button[data-action="save-schedule"]');
+      if (saveBtn) {
+        const block = saveBtn.closest('.drawer-add-schedule');
+        if (!block) return;
+        const lineId = block.dataset.lineId;
+        const weekday = parseTimeInput(block.querySelector('.drawer-add-input[data-day="weekday"]')?.value);
+        const saturday = parseTimeInput(block.querySelector('.drawer-add-input[data-day="saturday"]')?.value);
+        const sunday = parseTimeInput(block.querySelector('.drawer-add-input[data-day="sunday"]')?.value);
+        const schedules = {};
+        if (weekday.length) schedules.weekday = weekday;
+        if (saturday.length) schedules.saturday = saturday;
+        if (sunday.length) schedules.sunday = sunday;
+        if (lineId && (weekday.length || saturday.length || sunday.length)) {
+          saveLineSchedules(lineId, schedules);
+        }
       }
     });
   }
@@ -297,6 +377,15 @@
     if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
     if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
     if (deptFilter) deptFilter.addEventListener('change', refresh);
+    const btnHorarios = $('#btn-horarios-reales');
+    const helpHorarios = $('#help-horarios');
+    if (btnHorarios && helpHorarios) {
+      btnHorarios.addEventListener('click', () => {
+        const open = !helpHorarios.hidden;
+        helpHorarios.hidden = open;
+        btnHorarios.setAttribute('aria-expanded', !open);
+      });
+    }
     loadData().then(() => {
       fillDeptFilter();
       refresh();

@@ -52,7 +52,13 @@
   </main>
 
   <footer class="footer">
-    <p>Datos de referencia. Consultar en Google Maps u OpenStreetMap para información en tiempo real.</p>
+    <p>Líneas según <a href="https://www.redtulum.gob.ar/lineas" target="_blank" rel="noopener">Red Tulum</a>. Horarios reales: <a href="https://www.google.com/maps/search/colectivos+Red+Tulum+San+Juan+Argentina" target="_blank" rel="noopener">Google Maps</a>, app Red Tulum o <a href="https://moovitapp.com/san_juan-6137" target="_blank" rel="noopener">Moovit</a>.</p>
+    <button type="button" class="footer-help" id="btn-horarios-reales" aria-expanded="false">¿Cómo agregar horarios reales?</button>
+    <div id="help-horarios" class="help-horarios" hidden>
+      <p><strong>En Google Maps:</strong> Buscá la línea (ej. «colectivo 120 San Juan») o una parada; en la ficha del transporte suelen aparecer horarios. También: <a href="https://www.google.com/maps/search/transporte+p%C3%BAblico+San+Juan+Argentina" target="_blank" rel="noopener">transporte público San Juan</a>.</p>
+      <p><strong>Otras opciones:</strong> App <a href="https://www.redtulum.gob.ar/app" target="_blank" rel="noopener">Red Tulum</a> y <a href="https://moovitapp.com/san_juan-6137" target="_blank" rel="noopener">Moovit</a> (San Juan). En cada línea de esta web tenés «Ver recorrido en Moovit».</p>
+      <p><strong>Para que aparezcan acá:</strong> Si tenés los horarios (de Google Maps, Moovit o la app), cargalos en <code>data/lines.json</code> en el <a href="https://github.com/Alechavezsw/bus" target="_blank" rel="noopener">repositorio</a>: <code>"schedules"</code> con <code>"weekday"</code>, <code>"saturday"</code>, <code>"sunday"</code> y arrays como <code>["06:00","06:30","07:00"]</code>.</p>
+    </div>
   </footer>
 
   <script src="app.js"></script>
