@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horarios Red Tulumén - San Juan</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo">Red Tulumén</h1>
+      <p class="tagline">Horarios de colectivos · San Juan</p>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="search-section">
+      <label for="search" class="visually-hidden">Buscar línea o parada</label>
+      <input type="search" id="search" class="search-input" placeholder="Buscar línea o parada..." autocomplete="off">
+      <label for="dept-filter" class="visually-hidden">Departamento</label>
+      <select id="dept-filter" class="dept-filter" aria-label="Filtrar por departamento">
+        <option value="">Todos los departamentos</option>
+      </select>
+    </section>
+
+    <section class="tabs" role="tablist">
+      <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="lines">Líneas</button>
+      <button type="button" class="tab" role="tab" aria-selected="false" data-tab="stops">Paradas</button>
+    </section>
+
+    <div class="content">
+      <div id="panel-lines" class="panel active" role="tabpanel">
+        <ul id="lines-list" class="lines-list" aria-label="Líneas de colectivo"></ul>
+      </div>
+      <div id="panel-stops" class="panel" role="tabpanel" hidden>
+        <ul id="stops-list" class="stops-list" aria-label="Paradas"></ul>
+      </div>
+    </div>
+
+    <aside id="drawer" class="drawer" aria-hidden="true">
+      <div class="drawer-header">
+        <h2 id="drawer-title" class="drawer-title"></h2>
+        <button type="button" class="drawer-close" id="drawer-close" aria-label="Cerrar">×</button>
+      </div>
+      <div id="drawer-content" class="drawer-content"></div>
+    </aside>
+    <div id="drawer-backdrop" class="drawer-backdrop" aria-hidden="true"></div>
+  </main>
+
+  <footer class="footer">
+    <p>Datos de referencia. Consultar en Google Maps u OpenStreetMap para información en tiempo real.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
